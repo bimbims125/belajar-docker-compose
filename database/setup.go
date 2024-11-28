@@ -10,7 +10,7 @@ import (
 var DB *sql.DB
 
 func ConnectDatabase() {
-	dsn := "root:pram123@tcp(mysql:3306)/db_go_api"
+	dsn := "root:pram123@tcp(localhost:3306)/db_go_api"
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {

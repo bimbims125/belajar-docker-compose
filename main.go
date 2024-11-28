@@ -9,19 +9,17 @@ import (
 )
 
 func main() {
-	// Hubungkan ke database
+	// connect to database
 	database.ConnectDatabase()
 
-	// log.Println("Berhasil terhubung ke database")
-
-	// Inisialisasi router
+	// Routers
 	router := routers.Routers()
 
-	// Tentukan port server
+	// define ports
 	port := ":3300"
 	log.Printf("Server running on http://localhost%s", port)
 
-	// Jalankan server
+	// Run server
 	if err := http.ListenAndServe(port, router); err != nil {
 		log.Fatalf("Error when running server: %v", err)
 	}

@@ -7,30 +7,11 @@ import (
 
 	"github.com/bimbims125/belajar-docker-compose/database"
 	"github.com/bimbims125/belajar-docker-compose/models"
+	"github.com/bimbims125/belajar-docker-compose/utils"
 	"github.com/gorilla/mux"
 )
 
-const (
-	status500 = http.StatusInternalServerError
-	status404 = http.StatusNotFound
-	status201 = http.StatusCreated
-	status200 = http.StatusOK
-	status422 = http.StatusUnprocessableEntity
-)
-
-type SuccessResponseMessage struct {
-	Message string `json:"message"`
-}
-
-type ErrorResponseMessage struct {
-	Message string `json:"message"`
-}
-
-type SuccessResponse struct {
-	Data interface{} `json:"data"`
-}
-
-func GetPostHandler(w http.ResponseWriter, r *http.Request) {
+func GetAllPostHandler(w http.ResponseWriter, r *http.Request) {
 	db := database.DB
 
 	rows, err := db.Query("SELECT * FROM posts")
@@ -45,11 +26,11 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&post.Id, &post.Title, &post.Content)
 		posts = append(posts, post)
 	}
-	response := SuccessResponse{
+	response := models.SuccessResponse{
 		Data: posts,
 	}
 
-	w.WriteHeader(status200)
+	w.WriteHeader(utils.Status200)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -73,16 +54,16 @@ func GetPostByIdHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(posts) == 0 {
-		w.WriteHeader(status404)
-		json.NewEncoder(w).Encode(ErrorResponseMessage{
+		w.WriteHeader(utils.Status404)
+		json.NewEncoder(w).Encode(models.ErrorResponseMessage{
 			Message: "Post not found",
 		})
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status200)
-	json.NewEncoder(w).Encode(SuccessResponse{
+	w.WriteHeader(utils.Status200)
+	json.NewEncoder(w).Encode(models.SuccessResponse{
 		Data: posts[0],
 	})
 	return
@@ -99,8 +80,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if post.Title == "" || post.Content == "" {
-		w.WriteHeader(status422)
-		json.NewEncoder(w).Encode(ErrorResponseMessage{
+		w.WriteHeader(utils.Status422)
+		json.NewEncoder(w).Encode(models.ErrorResponseMessage{
 			Message: "can't create data",
 		})
 		return
@@ -111,8 +92,47 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query.LastInsertId()
-	w.WriteHeader(status201)
-	json.NewEncoder(w).Encode(SuccessResponseMessage{
+	w.WriteHeader(utils.Status201)
+	json.NewEncoder(w).Encode(models.SuccessResponseMessage{
 		Message: "Create post success",
 	})
+}
+
+func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	db := database.DB
+
+	var post models.Post
+
+	err := json.NewDecoder(r.Body).Decode(&post)
+	if err != nil {
+		log.Fatalf("Can't decode data : %v", err)
+	}
+
+	query, err := db.Exec("UPDATE posts SET title=?, content=? WHERE id=?", post.Title, post.Content, id)
+	if err != nil {
+		log.Fatalf("Cannot query : %v", err)
+	}
+
+	rowsAffected, err := query.RowsAffected()
+	if err != nil {
+		log.Fatalf("Cannot update data : %v", err)
+		return
+	}
+
+	if rowsAffected == 0 {
+		// log.Fatalf("Data not found")
+		w.WriteHeader(utils.Status404)
+		json.NewEncoder(w).Encode(models.ErrorResponseMessage{
+			Message: "Not found",
+		})
+		return
+	}
+
+	w.WriteHeader(utils.Status200)
+	json.NewEncoder(w).Encode(models.SuccessResponseMessage{
+		Message: "Update data success",
+	})
+
 }

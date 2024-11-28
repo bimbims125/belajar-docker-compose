@@ -5,15 +5,33 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Routers
-func Routers() *mux.Router {
-	routers := mux.NewRouter()
-
+// PostsRouters for handle routing related posts
+func PostsRouters(router *mux.Router) {
 	// GET
-	routers.HandleFunc("/posts", handler.GetPostHandler).Methods("GET")
-	routers.HandleFunc("/posts/{id}", handler.GetPostByIdHandler).Methods("GET")
+	router.HandleFunc("/posts", handler.GetAllPostHandler).Methods("GET")
+	router.HandleFunc("/posts/{id}", handler.GetPostByIdHandler).Methods("GET")
 
 	// POST
-	routers.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
+	router.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
+
+	// PUT
+	router.HandleFunc("/posts/{id}", handler.UpdatePostHandler).Methods("PUT")
+}
+
+// UsersRouters for handling routing related users
+func UsersRouters(router *mux.Router) {
+	// GET
+	router.HandleFunc("/users", handler.GetAllUserHandler)
+}
+
+// Routers combine all routers
+func Routers() *mux.Router {
+	// Main utama
+	routers := mux.NewRouter()
+
+	// Routing for posts and users
+	PostsRouters(routers)
+	UsersRouters(routers)
+
 	return routers
 }
