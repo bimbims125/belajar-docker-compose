@@ -15,7 +15,7 @@ You can use docker compose for run multicontainer
 
 ### Setup docker compose
 
-- #### Setup MySQL container
+#### Setup MySQL container
 Change ```container_name``` with your preferences name
 
 **Example :**
@@ -36,7 +36,7 @@ Change ```MYSQL_DATABASE``` value with your database name
 MYSQL_DATABASE=your_db_name
 ```
 
-- #### Setup go application
+#### Setup go application
 Change go application ```ports```
 
 **Example :**
