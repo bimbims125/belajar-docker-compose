@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: pramysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: pram123
+      MYSQL_DATABASE: db_go_api
+    volumes:
+      - mysql-data:/var/lib/mysql
+    expose:
+      - "3306"
+    networks:
+      - go-network
+    refresh: always
+
+  go-web-app:
+    container_name: my-web-app
+    build: .
+    ports:
+      - "3300:3300"
+    networks:
+      - go-network
+    depends_on:
+      - mysql
+    refresh: always
+
+
+networks:
+  go-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
