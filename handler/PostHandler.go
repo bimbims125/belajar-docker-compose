@@ -134,5 +134,4 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(models.SuccessResponseMessage{
 		Message: "Update data success",
 	})
-
 }

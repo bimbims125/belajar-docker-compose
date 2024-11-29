@@ -21,7 +21,9 @@ func PostsRouters(router *mux.Router) {
 // UsersRouters for handling routing related users
 func UsersRouters(router *mux.Router) {
 	// GET
-	router.HandleFunc("/users", handler.GetAllUserHandler)
+	router.HandleFunc("/users", handler.GetAllUserHandler).Methods("GET")
+
+	router.HandleFunc("/users", handler.CreateUserHandler).Methods("POST")
 }
 
 // Routers combine all routers
